@@ -22,6 +22,9 @@ sub new {
 sub Get {
    my ($self, $LongURL) = @_;
    
+   my $RetriesLeft = 3;
+   my $RetryDelay  = 5;
+   
    $LongURL = uri_escape($LongURL);
    
    #$self->{curl}->setopt(CURLOPT_HEADER,1);
@@ -29,29 +32,35 @@ sub Get {
    #$self->{curl}->setopt(CURLOPT_POST, 1);
    #$self->{curl}->setopt(CURLOPT_POSTFIELDS,'url=' . $LongURL);
 #   $self->{curl}->setopt(CURLOPT_URL, 'http://tinyurl.com/create.php');
-   $self->{curl}->setopt(CURLOPT_URL, 'http://tinyurl.com/create.php?url=' . $LongURL);
+   
+   while ($RetriesLeft--) {
+      $self->{curl}->setopt(CURLOPT_URL, 'http://tinyurl.com/create.php?url=' . $LongURL);
 
-   my $response_body;
-   $self->{curl}->setopt(CURLOPT_WRITEDATA,\$response_body);
+      my $response_body;
+      $self->{curl}->setopt(CURLOPT_WRITEDATA,\$response_body);
 
-   # Starts the actual request
-   my $retcode = $self->{curl}->perform;
-   $self->{retcode} = $retcode;
+      # Starts the actual request
+      my $retcode = $self->{curl}->perform;
+      $self->{retcode} = $retcode;
 
-   # Looking at the results...
-   if ($retcode == 0) {
-      #print("Transfer went ok\n");
-      my $response_code = $self->{curl}->getinfo(CURLINFO_HTTP_CODE);
-      # judge result and next action based on $response_code
-      #print("Received response: $response_body\n");
-      # We expect to find the short URL in the json result in the form "id": "http://goo.gl/fbsS"
-      $response_body =~ m/\<a\ href="(http:\/\/tinyurl\.com\/[^"]*)"/;
-      return $1;
-   } else {
-      # Error code, type of error, error message
-      print("An error happened: $retcode " . $self->{curl}->strerror($retcode) . " " . $self->{curl}->errbuf."\n");
-      return undef;
+      # Looking at the results...
+      if ($retcode == 0) {
+         #print("Transfer went ok\n");
+         my $response_code = $self->{curl}->getinfo(CURLINFO_HTTP_CODE);
+         # judge result and next action based on $response_code
+         #print("Received response: $response_body\n");
+         # We expect to find the short URL in the json result in the form "id": "http://goo.gl/fbsS"
+         $response_body =~ m/\<a\ href="(http:\/\/tinyurl\.com\/[^"]*)"/;
+         return $1 if $1;
+      } else {
+         # Error code, type of error, error message
+         print("An error happened: $retcode " . $self->{curl}->strerror($retcode) . " " . $self->{curl}->errbuf."\n");
+      }
+      
+      sleep($RetryDelay);
    }
+   
+   return undef;
 }
 #=======================================================================
 
