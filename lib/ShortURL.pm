@@ -19,12 +19,19 @@ my $ShortURL;
 sub new {
    my ($class, $params) = @_;
    
+   # Return the logger object if already created...
    if (defined($ShortURL)) {
       return $ShortURL;
    }
    
+   # Get the logger object which should have bee created by the host 
+   #    applicaion.
    $Logger = Logger->GetLogger();
 
+   # Get a database object.  We would normally expect the host program to 
+   #    have created a database object but if not, we will pass along the
+   #    the parameters given us in case the host application wants us to
+   #    make the DB connection.
    $DB_Connection = GetConnection($params);
 }
 
