@@ -15,7 +15,7 @@ my $TableName = 'sand_box.short_url_log';
 my $DB_Connection;
 my $Logger;
 my $ShortURL;
-my $Creator = '';
+my $Creator = 'Unknown';
 
 
 sub new {
@@ -26,11 +26,12 @@ sub new {
       return $ShortURL;
    }
    
+   # Capture the creator identity if specified...
    if (exists($params->{creator})) {
       $Creator = $params->{creator};
    }
    
-   # Get the logger object which should have bee created by the host 
+   # Get the logger object which should have been created by the host 
    #    applicaion.
    $Logger = Logger->GetLogger();
 
@@ -61,13 +62,13 @@ sub Get {
    my $result = $DB_Connection->Execute($sql);
    if (my $row = $result->fetchrow_hashref()) {
       # we've already see this url, return the existing value...
-      $short_code = $row->["short_code"];
+      $short_code = $row->{"short_url"};
    } else {
       # There was no existing short code, we must create one...
       # Loop and create another code if the new code is not unique...
-      while (1) {
+      while (TRUE) {
          $short_code = encode_base36(time());
-         #print "converted to $short_code\n"; exit(0);
+         #print "converted to $short_url\n"; exit(0);
          # does the code already exist...
          $result = $DB_Connection->Execute("select long_url from $TableName where short_url = '$short_code';");
          last unless ($result->fetchrow_hashref());
