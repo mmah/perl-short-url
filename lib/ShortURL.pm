@@ -10,12 +10,12 @@ use Time::HiRes;
 use constant TRUE => 1;
 use constant FALSE => 0;
 
-my $TableName = 'sand_box.short_url_log';
+my $TableName = ' short_url_lookup';
 
 my $DB_Connection;
 my $Logger;
 my $ShortURL;
-my $Creator = 'Unknown';
+my $Creator = 'HCRE';
 
 
 sub new {
@@ -74,10 +74,10 @@ sub Get {
          last unless ($result->fetchrow_hashref());
       }
       # Now we have a unique code...insert it...
-      $DB_Connection->DoIO("insert into $TableName (long_url, short_url, created_by) values ('$LongURL', '$short_code', '$Creator');");
+      $DB_Connection->DoIO("insert into $TableName (long_url, short_url, app_name) values ('$LongURL', '$short_code', '$Creator');");
    }
    
-   return $short_code;
+   return "http://vst.vet/" . $short_code;
 }
 #=======================================================================
 
