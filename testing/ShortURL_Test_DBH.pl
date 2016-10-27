@@ -18,11 +18,11 @@ my $DB_Connection = DB_Connect->GetConnection({
                                               });
 print "DB Connection opened\n";
 
-my $shortener = ShortURL->new({creator=>'test', DBH=>$DB_Connection->DBH()});
+my $shortener = ShortURL->new({creator=>'HCRE', DBH=>$DB_Connection->DBH()});
 print "Shortener created\n";
 
 my $long_url = "http://www.google101.com/";
-$long_url = 'https://appointments.vetstoria.com/HHHHHHH/UmFuZG9tSVaIUZlMs4hT5WyShFongYxCcWsyhcCkhebQkh3ZPbO0PfDv01WW6uQ_UnHGXu09Xk3g2ADmKu8oGhiA0xXGdZLA';
+$long_url = 'https://appointments.vetstoria.com/HHHHHHH/UmFuZG9tSVaIUZlMs4hT5WyShFongYxCcWsyhcCkhebQkh3ZPbO0PfDv01WW6uQ_UnHGXu09Xk3g2ADmKu8oGhiA0xXGdZLAx';
 my $short_url = $shortener->Get($long_url);
 
 unless (defined $short_url) {

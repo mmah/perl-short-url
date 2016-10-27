@@ -18,7 +18,7 @@ my $DB_Connection = DB_Connect->GetConnection({
                                               });
 print "DB Connection opened\n";
 
-my $shortener = ShortURL->new({creator=>'test'});
+my $shortener = ShortURL->new({creator=>'HCRE'});
 print "Shortener created\n";
 
 my $long_url = "http://www.google101.com/";
