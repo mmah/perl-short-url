@@ -1,4 +1,5 @@
 <?php
+   $echo_only = false;
    $short_code = "";
    if (@$_GET['file']) {
       $short_code = @$_GET['file']; 
@@ -19,7 +20,13 @@ END_HTML;
       exit();
    }
 
-   $table_name = "sand_box.short_url_log";
+   // Is this a test command?
+   if (substr($short_code, 0, 1) == "*") {
+      $echo_only = true;
+      $short_code = substr($short_code, 1, strlen($short_code)-1);
+   }
+
+   $table_name = "short_url_lookup";
 
    $dbhost = "ya-vsdbtest-02";
    //$dbhost = "ya-dbprod-01";
@@ -55,7 +62,7 @@ END_HTML;
    <head>
    </head>
    <body>
-      Error: Unable to recognize the link you entered.
+      Error: Unable to recognize the link you entered ('$short_code').
       Please check the spelling to make sure it is entered correctly.
       If it is entered correctly, the link may be too old to be recognized.
    </body>
@@ -65,6 +72,19 @@ END_HTML;
    } else {
       $row = pg_fetch_array($result, 0);
       $long_url = $row["long_url"];
+   }
+
+   if ($echo_only) {
+      echo <<<END_HTML
+<html>
+   <head>
+   </head>
+   <body>
+      Target of '$short_code' is '$long_url'.
+   </body>
+</html>
+END_HTML;
+      exit();
    }
 
    $redir = "Location: $long_url";
