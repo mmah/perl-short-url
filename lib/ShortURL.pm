@@ -15,7 +15,6 @@ my $TableName = ' short_url_lookup';
 my $DB_Connection;
 my $Logger;
 my $ShortURL;
-my $Creator = 'HCRE';
 
 
 sub new {
@@ -24,11 +23,6 @@ sub new {
    # Return the logger object if already created...
    if (defined($ShortURL)) {
       return $ShortURL;
-   }
-   
-   # Capture the creator identity if specified...
-   if (exists($params->{creator})) {
-      $Creator = $params->{creator};
    }
    
    # Get the logger object which should have been created by the host 
@@ -42,9 +36,24 @@ sub new {
    $DB_Connection = DB_Connect->GetConnection($params);
    
    my $self = {
+                 
               };
               
    bless $self, $class;
+   
+   # Capture the creator identity if specified...
+   if (exists($params->{creator})) {
+      $self->{creator} = $params->{creator};
+   } else {
+      die "Fatal: The short URL requestor was not supplied";
+   }
+   
+   # Capture the creator identity if specified...
+   if (exists($params->{ttl})) {
+      $self->{ttl} = $params->{ttl};
+   } else {
+      $self->{ttl} = '1 year';
+   }
    
    return $self;
 }
@@ -74,7 +83,7 @@ sub Get {
          last unless ($result->fetchrow_hashref());
       }
       # Now we have a unique code...insert it...
-      $DB_Connection->DoIO("insert into $TableName (long_url, short_url, app_name) values ('$LongURL', '$short_code', '$Creator');");
+      $DB_Connection->DoIO("insert into $TableName (long_url, short_url, app_name, expire_date) values ('$LongURL', '$short_code', '$self->{creator}', now()+'$self->{ttl}'::interval);");
    }
    
    return "http://vst.vet/" . $short_code;
