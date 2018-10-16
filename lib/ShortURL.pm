@@ -47,7 +47,6 @@ sub new {
    } else {
       $self->{creator} = 'HCRE';
       # die "Fatal: The short URL requestor was not supplied";
-    }
    }
 
    # Capture the creator identity if specified...
